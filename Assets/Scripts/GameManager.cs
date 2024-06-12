@@ -12,13 +12,15 @@ public class GameManager : MonoBehaviour
     public Transform spawnPoint;
     public GameObject particle;
     public bool canInvoke = true;
-    public int timeScale = 1;
 
     // Start is called before the first frame update
     void Start()
     {
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         spawnPoint = GameObject.Find("SpawnPoint").GetComponent<Transform>();
+        tubeShape = PlayerPrefs.GetInt("tubeShape");
+        circleDiameter = PlayerPrefs.GetInt("diameterValue");
+        rectangleShape = new Vector2(PlayerPrefs.GetInt("xShapeValue"), PlayerPrefs.GetInt("yShapeValue"));
         if (tubeShape == 0)
         {
             instantiateCircle(circleTube, circleDiameter, spawnPoint);
@@ -31,8 +33,6 @@ public class GameManager : MonoBehaviour
 
     private void FixedUpdate() 
     {
-        Time.timeScale = timeScale;
-
         if (canInvoke)
         {
             invokeParticle(particle, spawnPoint);
@@ -41,8 +41,8 @@ public class GameManager : MonoBehaviour
 
     private void instantiateCircle(GameObject circleTube, float diameter, Transform spawnPoint)
     {
-        Instantiate(circleTube, spawnPoint.position, Quaternion.identity);
-        Transform circle = GameObject.FindGameObjectWithTag("Tube").GetComponent<Transform>();
+        GameObject circleObj = Instantiate(circleTube, spawnPoint.position, Quaternion.identity);
+        Transform circle = circleObj.GetComponent<Transform>();
         circle.localScale = new Vector3(diameter, diameter, 1); 
         mainCamera.orthographicSize = diameter;
         thresholdDistance = diameter * 0.25f;
@@ -50,8 +50,8 @@ public class GameManager : MonoBehaviour
 
     private void instantiateRectangle(GameObject rectangleTube, Vector2 shape, Transform spawnPoint)
     {
-        Instantiate(rectangleTube, spawnPoint.position, Quaternion.identity);
-        Transform rectangle = GameObject.FindGameObjectWithTag("Tube").GetComponent<Transform>();
+        GameObject rectangleObj = Instantiate(rectangleTube, spawnPoint.position, Quaternion.identity);
+        Transform rectangle = rectangleObj.GetComponent<Transform>();
         rectangle.localScale = shape;
         if (shape.x > shape.y)
         {
@@ -71,5 +71,10 @@ public class GameManager : MonoBehaviour
         GameObject generatedParticle = Instantiate(particle, spawnPoint.position, Quaternion.identity);
         float side = Random.Range(1f, 10f);
         generatedParticle.transform.localScale = new Vector3(side, side, 1);
+    }
+
+    public void goToMenu()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 }
